@@ -31,22 +31,51 @@ $(function() {
          * in the allFeeds object and ensures it has a URL defined
          * and that the URL is not empty.
          */
-
+         it('all feeds has url and not empty', function(){
+            for (var i = 0, len = allFeeds.length; i < len; i ++ ) {
+                var url = allFeeds[i].url;
+                expect(url).toBeDefined();
+                expect(url).not.toBe('');
+            }
+         });
 
         /* TODO: Write a test that loops through each feed
          * in the allFeeds object and ensures it has a name defined
          * and that the name is not empty.
          */
+         it('all feeds has name and not empty', function(){
+            for (var i = 0, len = allFeeds.length; i < len; i ++ ) {
+                var name = allFeeds[i].name;
+                expect(name).toBeDefined();
+                expect(name).not.toBe('');
+            }
+         });
+
     });
 
 
     /* TODO: Write a new test suite named "The menu" */
+    describe('Menu', function(){
+
+        var body,
+            menuIcon,
+            menuHidden;
+
+        // Get elements for every spec.
+        beforeEach(function(){
+            body = $('body');
+            menuIcon = $('.menu-icon-link');
+            menuHidden = body.hasClass('menu-hidden');
+        });
 
         /* TODO: Write a test that ensures the menu element is
          * hidden by default. You'll have to analyze the HTML and
          * the CSS to determine how we're performing the
          * hiding/showing of the menu element.
          */
+        it('Menu is hiding by default', function(){
+            expect(menuHidden).toBeTruthy();
+        });
 
          /* TODO: Write a test that ensures the menu changes
           * visibility when the menu icon is clicked. This test
@@ -54,7 +83,30 @@ $(function() {
           * clicked and does it hide when clicked again.
           */
 
+        it('Menu icon change visibility', function(){
+
+            // Check if menu are now hidden or not. True for hidden, false for showing.
+            if (menuHidden) {
+                // Trigger click event.
+                menuIcon.click();
+                // If menu was hidden then it shouldn't have 'menu-hidden' class when click.
+                expect(body.hasClass('menu-hidden')).toBeFalsy();
+            } else {
+                menuIcon.click();
+                // If menu was showing then it should have 'menu-hidden' class when click.
+                expect(body.hasClass('menu-hidden')).toBeTruthy();
+            }
+            // Change menu icon to normal state
+            menuIcon.click();
+
+        });
+
+    });
+
+
     /* TODO: Write a new test suite named "Initial Entries" */
+
+    describe('Initial Entries', function(){
 
         /* TODO: Write a test that ensures when the loadFeed
          * function is called and completes its work, there is at least
@@ -63,10 +115,56 @@ $(function() {
          * the use of Jasmine's beforeEach and asynchronous done() function.
          */
 
-    /* TODO: Write a new test suite named "New Feed Selection"
+        beforeEach(function(done){
+            loadFeed(0, done);
+        });
+
+        it('There should be at least a single element', function(done){
+            expect($('.feed .entry').length).toBeGreaterThan(1);
+            // Invoke done callback function
+            done();
+        });
+
+    });
+
+    /* TODO: Write a new test suite named "New Feed Selection" */
+
+    describe('New Feed Selection', function(){
 
         /* TODO: Write a test that ensures when a new feed is loaded
          * by the loadFeed function that the content actually changes.
          * Remember, loadFeed() is asynchronous.
          */
+        var feed0,feed1;
+
+        beforeEach(function(done){
+            loadFeed(0, function(){
+                // Get the first article header of the current feed
+                feed0 = $('.feed').find('h2')[0].innerText;
+                // Invoke done callback function
+                done();
+            });
+        });
+
+        // Change feed back to the first one.
+        afterEach(function(done){
+            loadFeed(0, done);
+        });
+
+        it('Content Actually Changed', function(done){
+
+            // Load new feed
+            loadFeed(1, function(){
+                // Get the first article header of the new feed
+                feed1 = $('.feed').find('h2')[0].innerText;
+                // Compare two of them, should not equal
+                expect(feed0).not.toEqual(feed1);
+                // Invoke done callback function
+                done();
+            });
+
+        });
+
+    });
+
 }());
